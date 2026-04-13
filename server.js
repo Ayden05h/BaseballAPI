@@ -1,28 +1,45 @@
-const express = require("express")
-const app = express()
-require("dotenv").config()
+const express = require("express");
+const app = express();
 
-//const logger = require("./middleware/logger")
-//const errorHandler = require("./middleware/errorHandler")
+const { sequelize } = require("./models");
 
-//const teamRoutes = require("./routes/teams")
-//const playerRoutes = require("./routes/players")
-//const statsRoutes = require("./routes/stats")
+// Routes
+const teamRoutes = require("./routes/teams");
+const playerRoutes = require("./routes/players");
+const statsRoutes = require("./routes/stats");
 
-app.use(express.json())
-app.use(logger)
+// Middleware
+const errorHandler = require("./middleware/errorHandler");
 
-app.use("/teams", teamRoutes)
-app.use("/players", playerRoutes)
-app.use("/stats", statsRoutes)
+// Body parser
+app.use(express.json());
 
+// Logger middleware
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url}`);
+    next();
+});
+
+// Routes 
+app.use("/teams", teamRoutes);
+app.use("/players", playerRoutes);
+app.use("/stats", statsRoutes);
+
+// Health check route
 app.get("/", (req, res) => {
-    res.send("Baseball Stats API Running")
-})
+    res.send("Baseball API Running");
+});
 
-app.use(errorHandler)
+// Error handler 
+app.use(errorHandler);
 
-const PORT = process.env.PORT || 3000
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+const PORT = 3000;
 
-module.exports = app
+// start server
+sequelize.sync().then(() => {
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+});
+
+module.exports = app;

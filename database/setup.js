@@ -1,8 +1,14 @@
-const { sequelize } = require("../models")
+const sequelize = require("../database/db");
 
 async function setup() {
-    await sequelize.sync({ force: true })
-    console.log("Database synced")
+    try {
+        await sequelize.sync({ force: true });
+        console.log("Database synced successfully");
+    } catch (error) {
+        console.error("Database sync error:", error);
+    } finally {
+        await sequelize.close();
+    }
 }
 
-setup()
+setup();

@@ -1,13 +1,19 @@
-const sequelize = require("../database/db")
+const sequelize = require("../database/db");
 
-const Team = require("./Teams")
-const Player = require("./Player")
-const PlayerStats = require("./PlayerStats")
+const Team = require("./team");
+const Player = require("./player");
+const PlayerStats = require("./playerStats");
 
-Team.hasMany(Player, { foreignKey: "team_id" })
-Player.belongsTo(Team, { foreignKey: "team_id" })
+// Relationships
+Team.hasMany(Player, { foreignKey: "team_id", onDelete: "CASCADE" });
+Player.belongsTo(Team, { foreignKey: "team_id" });
 
-Player.hasMany(PlayerStats, { foreignKey: "player_id" })
-PlayerStats.belongsTo(Player, { foreignKey: "player_id" })
+Player.hasMany(PlayerStats, { foreignKey: "player_id", onDelete: "CASCADE" });
+PlayerStats.belongsTo(Player, { foreignKey: "player_id" });
 
-module.exports = { sequelize, Team, Player, PlayerStats }
+module.exports = {
+    sequelize,
+    Team,
+    Player,
+    PlayerStats
+};
