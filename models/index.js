@@ -1,6 +1,6 @@
 const sequelize = require("../database/db");
 
-const Team = require("./team");
+const Team = require("./Team");
 const Player = require("./player");
 const PlayerStats = require("./playerStats");
 const User = require("./user");
