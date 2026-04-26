@@ -10,14 +10,15 @@ const Team = sequelize.define("Team", {
     team_name: {
         type: DataTypes.STRING,
         allowNull: false,
+        unique: true,
         validate: {
             notEmpty: true,
             len: [2, 50]
-        },
-        unique: true
+        }
     }
 }, {
-    timestamps: true
+    timestamps: true,
+    tableName: "Teams"
 });
 
 module.exports = Team;

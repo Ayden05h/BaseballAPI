@@ -17,13 +17,17 @@ const Player = sequelize.define("Player", {
     },
     position: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        validate: {
+            notEmpty: true
+        }
     },
     jersey_number: {
         type: DataTypes.INTEGER,
         allowNull: false,
         validate: {
-            min: 0
+            min: 0,
+            max: 99
         }
     },
     team_id: {
@@ -35,7 +39,8 @@ const Player = sequelize.define("Player", {
         }
     }
 }, {
-    timestamps: true
+    timestamps: true,
+    tableName: "Players" 
 });
 
 module.exports = Player;

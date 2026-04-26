@@ -1,37 +1,112 @@
-const express = require("express")
-const router = express.Router()
-const { Player } = require("../models")
+const express = require("express");
+const router = express.Router();
+const { Player, Team } = require("../models");
 
-router.get("/", async (req, res) => {
-    const players = await Player.findAll()
-    res.json(players)
-})
+// GET all players
+router.get("/", async (req, res, next) => {
+    try {
+        const players = await Player.findAll();
+        res.json(players);
+    } catch (err) {
+        next(err);
+    }
+});
 
-router.post("/", async (req, res) => {
-    const player = await Player.create(req.body)
-    res.status(201).json(player)
-})
+// GET player by ID
+router.get("/:id", async (req, res, next) => {
+    try {
+        const player = await Player.findByPk(req.params.id);
 
-router.get("/:id", async (req, res) => {
-    const player = await Player.findByPk(req.params.id)
-    if (!player) return res.status(404).json({ error: "Player not found" })
-    res.json(player)
-})
+        if (!player) {
+            return res.status(404).json({
+                success: false,
+                error: "Player not found"
+            });
+        }
 
-router.put("/:id", async (req, res) => {
-    const player = await Player.findByPk(req.params.id)
-    if (!player) return res.status(404).json({ error: "Player not found" })
+        res.json(player);
+    } catch (err) {
+        next(err);
+    }
+});
 
-    await player.update(req.body)
-    res.json(player)
-})
+// CREATE player
+router.post("/", async (req, res, next) => {
+    try {
+        const { name, position, jersey_number, team_id } = req.body;
 
-router.delete("/:id", async (req, res) => {
-    const player = await Player.findByPk(req.params.id)
-    if (!player) return res.status(404).json({ error: "Player not found" })
+        // Basic validation (rubric requirement)
+        if (!name || !position || !team_id) {
+            return res.status(400).json({
+                success: false,
+                error: "name, position, and team_id are required"
+            });
+        }
 
-    await player.destroy()
-    res.json({ message: "Deleted" })
-})
+        // Ensure team exists (prevents FK crash)
+        const team = await Team.findByPk(team_id);
+        if (!team) {
+            return res.status(400).json({
+                success: false,
+                error: "Invalid team_id: team does not exist"
+            });
+        }
 
-module.exports = router
+        const player = await Player.create(req.body);
+
+        res.status(201).json({
+            success: true,
+            data: player
+        });
+    } catch (err) {
+        next(err);
+    }
+});
+
+// UPDATE player
+router.put("/:id", async (req, res, next) => {
+    try {
+        const player = await Player.findByPk(req.params.id);
+
+        if (!player) {
+            return res.status(404).json({
+                success: false,
+                error: "Player not found"
+            });
+        }
+
+        await player.update(req.body);
+
+        res.json({
+            success: true,
+            data: player
+        });
+    } catch (err) {
+        next(err);
+    }
+});
+
+// DELETE player
+router.delete("/:id", async (req, res, next) => {
+    try {
+        const player = await Player.findByPk(req.params.id);
+
+        if (!player) {
+            return res.status(404).json({
+                success: false,
+                error: "Player not found"
+            });
+        }
+
+        await player.destroy();
+
+        res.json({
+            success: true,
+            message: "Player deleted"
+        });
+    } catch (err) {
+        next(err);
+    }
+});
+
+module.exports = router;

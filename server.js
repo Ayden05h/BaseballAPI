@@ -7,25 +7,25 @@ const { sequelize } = require("./models");
 const teamRoutes = require("./routes/teams");
 const playerRoutes = require("./routes/players");
 const statsRoutes = require("./routes/stats");
+const authRoutes = require("./routes/auth");
 
 // Middleware
+const logger = require("./middleware/logger");
 const errorHandler = require("./middleware/errorHandler");
 
 // Body parser
 app.use(express.json());
 
 // Logger middleware
-app.use((req, res, next) => {
-    console.log(`${req.method} ${req.url}`);
-    next();
-});
+app.use(logger);
 
-// Routes 
+// Routes
+app.use("/auth", authRoutes);
 app.use("/teams", teamRoutes);
 app.use("/players", playerRoutes);
 app.use("/stats", statsRoutes);
 
-// Health check route
+// Health check
 app.get("/", (req, res) => {
     res.send("Baseball API Running");
 });
@@ -33,13 +33,15 @@ app.get("/", (req, res) => {
 // Error handler 
 app.use(errorHandler);
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-// start server
-sequelize.sync().then(() => {
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
+
+if (process.env.NODE_ENV !== "test") {
+    sequelize.sync().then(() => {
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
     });
-});
+}
 
 module.exports = app;

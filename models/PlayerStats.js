@@ -9,14 +9,18 @@ const PlayerStats = sequelize.define("PlayerStats", {
     },
     game_date: {
         type: DataTypes.DATE,
-        allowNull: false
+        allowNull: false,
+        validate: {
+            isDate: true
+        }
     },
     hits: {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0,
         validate: {
-            min: 0
+            min: 0,
+            max: 10
         }
     },
     walks: {
@@ -24,7 +28,8 @@ const PlayerStats = sequelize.define("PlayerStats", {
         allowNull: false,
         defaultValue: 0,
         validate: {
-            min: 0
+            min: 0,
+            max: 10
         }
     },
     strikeouts: {
@@ -32,7 +37,8 @@ const PlayerStats = sequelize.define("PlayerStats", {
         allowNull: false,
         defaultValue: 0,
         validate: {
-            min: 0
+            min: 0,
+            max: 10
         }
     },
     player_id: {
@@ -44,7 +50,8 @@ const PlayerStats = sequelize.define("PlayerStats", {
         }
     }
 }, {
-    timestamps: true
+    timestamps: true,
+    tableName: "PlayerStats"
 });
 
 module.exports = PlayerStats;

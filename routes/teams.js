@@ -3,45 +3,33 @@ const router = express.Router();
 
 const { Team } = require("../models");
 
-
+// GET all teams
 router.get("/", async (req, res, next) => {
     try {
         const teams = await Team.findAll();
-        res.json(teams);
+
+        res.json({
+            success: true,
+            data: teams
+        });
     } catch (err) {
         next(err);
     }
 });
 
-
+// GET team by ID
 router.get("/:id", async (req, res, next) => {
     try {
         const team = await Team.findByPk(req.params.id);
+
         if (!team) {
             return res.status(404).json({
                 success: false,
                 error: "Team not found"
             });
         }
-        res.json(team);
-    } catch (err) {
-        next(err);
-    }
-});
 
-
-router.post("/", async (req, res, next) => {
-    try {
-        if (!req.body.team_name) {
-            return res.status(400).json({
-                success: false,
-                error: "team_name is required"
-            });
-        }
-
-        const team = await Team.create(req.body);
-
-        res.status(201).json({
+        res.json({
             success: true,
             data: team
         });
@@ -50,7 +38,31 @@ router.post("/", async (req, res, next) => {
     }
 });
 
+// CREATE team
+router.post("/", async (req, res, next) => {
+    try {
+        const { team_name } = req.body;
 
+        if (!team_name) {
+            return res.status(400).json({
+                success: false,
+                error: "team_name is required"
+            });
+        }
+
+        const team = await Team.create({ team_name });
+
+        res.status(201).json({
+            success: true,
+            data: team
+        });
+
+    } catch (err) {
+        next(err);
+    }
+});
+
+// UPDATE team
 router.put("/:id", async (req, res, next) => {
     try {
         const team = await Team.findByPk(req.params.id);
@@ -68,12 +80,13 @@ router.put("/:id", async (req, res, next) => {
             success: true,
             data: team
         });
+
     } catch (err) {
         next(err);
     }
 });
 
-
+// DELETE team
 router.delete("/:id", async (req, res, next) => {
     try {
         const team = await Team.findByPk(req.params.id);
@@ -91,6 +104,7 @@ router.delete("/:id", async (req, res, next) => {
             success: true,
             message: "Team deleted"
         });
+
     } catch (err) {
         next(err);
     }
