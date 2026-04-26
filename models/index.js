@@ -1,8 +1,8 @@
 const sequelize = require("../database/db");
 
 const Team = require("./Team");
-const Player = require("./player");
-const PlayerStats = require("./playerStats");
+const Player = require("./Player");
+const PlayerStats = require("./PlayerStats");
 const User = require("./user");
 
 // Relationships
