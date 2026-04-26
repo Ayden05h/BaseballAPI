@@ -1,23 +1,30 @@
-# BaseballAPI
-
+A full-featured RESTful API for managing baseball teams, players, and player statistics. This API includes authentication, role-based authorization, and complete CRUD functionality.
 📌 Features
 Full CRUD API for:
 Teams
 Players
 Player Statistics
+🔐 JWT Authentication (login/register)
+🧑‍⚖️ Role-Based Authorization (user/admin)
+🔒 Protected routes with middleware
 Relational database with Sequelize associations
 Input validation and error handling
 Custom logging middleware
 Centralized error handler
 Seed script for sample data
-SQLite database (no external setup required)
+SQLite database (local development)
+Deployed to Render (production-ready)
 🧱 Tech Stack
 Node.js
 Express.js
 Sequelize ORM
-SQLite
+SQLite (development)
+PostgreSQL (recommended for production)
+JSON Web Tokens (JWT)
+bcryptjs
 JavaScript
-
+🌐 Live API
+👉 https://baseballapi.onrender.com
 📁 Project Structure
 project-root/
 │
@@ -25,16 +32,20 @@ project-root/
 │   └── db.js
 │
 ├── middleware/
+│   ├── auth.js
+│   ├── role.js
 │   ├── errorHandler.js
 │   └── logger.js
 │
 ├── models/
 │   ├── index.js
-│   ├── team.js
-│   ├── player.js
-│   └── playerStats.js
+│   ├── Team.js
+│   ├── Player.js
+│   ├── PlayerStats.js
+│   └── user.js
 │
 ├── routes/
+│   ├── auth.js
 │   ├── teams.js
 │   ├── players.js
 │   └── stats.js
@@ -44,53 +55,83 @@ project-root/
 ├── server.js
 ├── package.json
 └── README.md
-
 ⚙️ Setup Instructions
 1. Clone the repository
 git clone <your-repo-url>
-cd <your-repo-name>
+cd BaseballAPI
 2. Install dependencies
 npm install
-3. Set up the database
+3. Set environment variables
+Create a .env file:
+JWT_SECRET=your_secret_key
+4. Set up the database
 node setup.js
-This will sync all Sequelize models and create the database tables.
-4. Seed the database
+5. Seed the database
 node seed.js
-This will populate the database with sample teams, players, and stats.
-5. Start the server
+6. Start the server
 node server.js
-Server will run at:
+Server runs at:
 http://localhost:3000
+🔐 Authentication
+Register
+POST /auth/register
+{
+  "username": "testuser",
+  "password": "password123",
+  "role": "user"
+}
+Login
+POST /auth/login
+{
+  "username": "testuser",
+  "password": "password123"
+}
+Response:
+{
+  "success": true,
+  "token": "your_jwt_token"
+  }
+🔑 Using the Token
+Include this header for protected routes:
+Authorization: Bearer <your_token>
+🧑‍⚖️ User Roles
+Role	Permissions
+user	View data
+admin	Create, update, delete
 🧪 API Endpoints
 🏟 Teams
-Method	Endpoint	Description
-GET	/teams	Get all teams
-GET	/teams/:id	Get team by ID
-POST	/teams	Create a new team
-PUT	/teams/:id	Update a team
-DELETE	/teams/:id	Delete a team
+Method	Endpoint	Auth	Role
+GET	/teams	✔	user
+GET	/teams/:id	✔	user
+POST	/teams	✔	admin
+PUT	/teams/:id	✔	admin
+DELETE	/teams/:id	✔	admin
 🧑 Players
-Method	Endpoint	Description
-GET	/players	Get all players
-GET	/players/:id	Get player by ID
-POST	/players	Create a player
-PUT	/players/:id	Update a player
-DELETE	/players/:id	Delete a player
+Method	Endpoint	Auth
+GET	/players	✔
+GET	/players/:id	✔
+POST	/players	✔
+PUT	/players/:id	✔
+DELETE	/players/:id	✔
+
 📊 Player Stats
-Method	Endpoint	Description
-GET	/stats	Get all stats
-GET	/stats/:id	Get stat by ID
-POST	/stats	Create stats record
-PUT	/stats/:id	Update stats
-DELETE	/stats/:id	Delete stats
-📥 Example Request
-Create a Team
+Method	Endpoint	Auth
+GET	/stats	✔
+GET	/stats/:id	✔
+POST	/stats	✔
+PUT	/stats/:id	✔
+DELETE	/stats/:id	✔
+
+📥 Example Requests
+Create Team (Admin only)
 POST /teams
+Authorization: Bearer <token>
 Content-Type: application/json
 {
   "team_name": "Tigers"
 }
-Create a Player
+
+Create Player
 {
   "name": "John Smith",
   "position": "Pitcher",
@@ -106,8 +147,25 @@ Create Player Stats
   "player_id": 1
 }
 ⚠️ Error Handling
-All errors return JSON in the format:
+All errors return:
 {
   "success": false,
   "error": "Error message here"
 }
+🧪 Testing
+This API is fully testable using Postman.
+Test flows include:
+Register → Login → Save token
+Access protected routes
+Role-based access (admin vs user)
+Invalid token handling
+Edge cases (missing body, invalid credentials)
+🚀 Deployment Notes
+Hosted on Render
+Environment variables configured
+SQLite resets on redeploy (temporary storage)
+👉 For persistent production data, PostgreSQL is recommended.
+📬 Submission
+GitHub Repo: (add your link)
+Live API: https://baseballapi.onrender.com
+Postman Collection: (export from Postman and attach)
