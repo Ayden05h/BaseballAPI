@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
-
+const auth = require("../middleware/auth");
+const role = require("../middleware/role");
 const { Team } = require("../models");
 
 // GET all teams
-router.get("/", async (req, res, next) => {
+router.get("/", auth, async (req, res, next) => {
     try {
         const teams = await Team.findAll();
 
@@ -18,7 +19,7 @@ router.get("/", async (req, res, next) => {
 });
 
 // GET team by ID
-router.get("/:id", async (req, res, next) => {
+router.get("/:id", auth, async (req, res, next) => {
     try {
         const team = await Team.findByPk(req.params.id);
 
@@ -38,10 +39,10 @@ router.get("/:id", async (req, res, next) => {
     }
 });
 
-// CREATE team
-router.post("/", async (req, res, next) => {
+// CREATE team 
+router.post("/", auth, role(["admin"]), async (req, res, next) => {
     try {
-        const { team_name } = req.body;
+        const { team_name } = req.body || {};
 
         if (!team_name) {
             return res.status(400).json({
@@ -56,14 +57,13 @@ router.post("/", async (req, res, next) => {
             success: true,
             data: team
         });
-
     } catch (err) {
         next(err);
     }
 });
 
-// UPDATE team
-router.put("/:id", async (req, res, next) => {
+// UPDATE team 
+router.put("/:id", auth, role(["admin"]), async (req, res, next) => {
     try {
         const team = await Team.findByPk(req.params.id);
 
@@ -80,14 +80,13 @@ router.put("/:id", async (req, res, next) => {
             success: true,
             data: team
         });
-
     } catch (err) {
         next(err);
     }
 });
 
 // DELETE team
-router.delete("/:id", async (req, res, next) => {
+router.delete("/:id", auth, role(["admin"]), async (req, res, next) => {
     try {
         const team = await Team.findByPk(req.params.id);
 
@@ -104,7 +103,6 @@ router.delete("/:id", async (req, res, next) => {
             success: true,
             message: "Team deleted"
         });
-
     } catch (err) {
         next(err);
     }
