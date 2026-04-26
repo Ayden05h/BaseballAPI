@@ -7,9 +7,17 @@ const { User } = require("../models");
 // REGISTER
 router.post("/register", async (req, res, next) => {
     try {
-        const { username, password, role } = req.body;
+        const { username, password, role } = req.body || {};
+
+        if (!username || !password) {
+            return res.status(400).json({
+                success: false,
+                error: "Username and password are required"
+            });
+        }
 
         const existingUser = await User.findOne({ where: { username } });
+
         if (existingUser) {
             return res.status(400).json({
                 success: false,
@@ -38,7 +46,15 @@ router.post("/register", async (req, res, next) => {
 // LOGIN
 router.post("/login", async (req, res, next) => {
     try {
-        const { username, password } = req.body;
+    
+        const { username, password } = req.body || {};
+
+        if (!username || !password) {
+            return res.status(400).json({
+                success: false,
+                error: "Username and password are required"
+            });
+        }
 
         const user = await User.findOne({ where: { username } });
 
@@ -60,7 +76,7 @@ router.post("/login", async (req, res, next) => {
 
         const token = jwt.sign(
             { id: user.id, role: user.role },
-            process.env.JWT_SECRET || "secret",
+            process.env.JWT_SECRET, 
             { expiresIn: "1h" }
         );
 
